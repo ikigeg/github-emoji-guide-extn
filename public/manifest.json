@@ -3,7 +3,7 @@
     "name": "GitHub Code Review Emoji Guide",
     "version": "1.0.0",
     "description": "Helper extension to remind you of the various icons to assist you in your reviews!",
-    "permissions": ["declarativeContent"],
+    "permissions": [],
     "action": {
         "default_popup": "index.html"
     },
@@ -14,7 +14,7 @@
         }
     ],
     "host_permissions": [
-        "https://github.com/"
+        "https://github.com/*/pull/*"
     ],
     "icons": { 
         "16": "favicon-16x16.png",
