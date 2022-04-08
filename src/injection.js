@@ -17,7 +17,7 @@ function showEmojis(context, commentTextarea) {
   const node = document.createElement("div");
   node.setAttribute(
     'style',
-    'position:absolute; z-index: 100; left: 0; background: var(--color-canvas-subtle); color: white;',
+    'position:absolute; z-index: 100; left: 0; background: var(--color-canvas-subtle); border: 1px solid var(--color-border-default); color: white;',
   );
   const list = document.createElement("ul");
   list.setAttribute(
@@ -52,7 +52,7 @@ function showEmojis(context, commentTextarea) {
   context.appendChild(node);
 }
 
-function createButton(context, commentTextarea) {
+function createButton(context, commentTextarea, floating = false) {
   var button = document.createElement("input");
   button.type = "button";
   button.value = "🌱"; 
@@ -60,7 +60,7 @@ function createButton(context, commentTextarea) {
   button.classList.add('btn-octicon');
   button.setAttribute(
     'style',
-    'background-color: transparent; border: 0;',
+    !floating ? 'background-color: transparent; border: 0;' : 'background: var(--color-canvas-subtle); border: 1px solid var(--color-border-default); border-radius: 8px; position: absolute; right: 8px; bottom: -8px; padding: 4px;',
   );  
   button.onclick = (e) => { showEmojis(context, commentTextarea) };
   context.appendChild(button);
@@ -71,7 +71,7 @@ let addedNodes = [];
 const observer = new MutationObserver(mutations => {
   mutations.forEach(mutation => {
     mutation.addedNodes.forEach(addedNode => {
-      if (addedNode && addedNode.classList && addedNode.classList.contains('js-inline-comments-container')) {
+      if (addedNode && addedNode.classList && addedNode.classList.contains('js-inline-comments-container') && addedNode.querySelector('markdown-toolbar')) {
         const suggestionDiv = addedNode.querySelector('markdown-toolbar');
         const commentTextarea = addedNode.querySelector('textarea');
         createButton(suggestionDiv, commentTextarea);
@@ -82,11 +82,31 @@ const observer = new MutationObserver(mutations => {
 
 observer.observe(document.querySelector('body'), { subtree: true, childList: true });
 
-const addEmojisToReviewChangesButton = () => {
-  const reviewChangesButtonForm = document.querySelector('.js-previewable-comment-form');
-  const suggestionDiv = reviewChangesButtonForm.querySelector('markdown-toolbar');
-  const commentTextarea = reviewChangesButtonForm.querySelector('textarea');
-  createButton(suggestionDiv, commentTextarea);
+const applyButtonToForm = (context, floating = false) => {
+  if (!context) {
+    return;
+  }
+
+  const suggestionDiv = context.querySelector('markdown-toolbar');
+  if (!suggestionDiv) {
+    return;
+  }
+
+  const commentTextarea = context.querySelector('textarea');
+  createButton(suggestionDiv, commentTextarea, floating);
 }
 
-addEmojisToReviewChangesButton();
+const addEmojiButtonsToInlineForms = () => {
+  const reviewChangesButtonForm = document.querySelector('.js-previewable-comment-form');
+  if (reviewChangesButtonForm) {
+    applyButtonToForm(reviewChangesButtonForm)
+  }
+
+  const reviewInlineCommentForms = Array.from(document.querySelectorAll('.js-inline-comment-form'));
+  if (reviewInlineCommentForms) {
+    'div.flex-nowrap.d-inline-block.mr-3'
+    reviewInlineCommentForms.forEach((element) => applyButtonToForm(element, true));
+  }
+}
+
+addEmojiButtonsToInlineForms();
