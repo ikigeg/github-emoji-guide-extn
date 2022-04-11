@@ -17,7 +17,7 @@ function showEmojis(context, commentTextarea) {
   const node = document.createElement("div");
   node.setAttribute(
     'style',
-    'position:absolute; z-index: 100; left: 0; background: var(--color-canvas-subtle); border: 1px solid var(--color-border-default); color: white;',
+    'position:absolute; z-index: 100; top: 0; left: 0; background: var(--color-canvas-subtle); border: 1px solid var(--color-border-default); color: white;',
   );
   const list = document.createElement("ul");
   list.setAttribute(
@@ -52,7 +52,7 @@ function showEmojis(context, commentTextarea) {
   context.appendChild(node);
 }
 
-function createButton(context, commentTextarea, floating = false) {
+function createButton(container, commentTextarea) {
   var button = document.createElement("input");
   button.type = "button";
   button.value = "🌱"; 
@@ -60,21 +60,35 @@ function createButton(context, commentTextarea, floating = false) {
   button.classList.add('btn-octicon');
   button.setAttribute(
     'style',
-    !floating ? 'background-color: transparent; border: 0;' : 'background: var(--color-canvas-subtle); border: 1px solid var(--color-border-default); border-radius: 8px; position: absolute; right: 8px; bottom: -8px; padding: 4px;',
+    'background: var(--color-canvas-subtle); border: 1px solid var(--color-border-default); border-radius: 8px; position: absolute; left: -34px; top: 6px; padding: 4px;',
   );  
-  button.onclick = (e) => { showEmojis(context, commentTextarea) };
-  context.appendChild(button);
+  button.onclick = (e) => { showEmojis(container, commentTextarea) };
+  container.appendChild(button);
 }
 
-let addedNodes = [];
+let divsWithButton = [];
 
 const observer = new MutationObserver(mutations => {
   mutations.forEach(mutation => {
     mutation.addedNodes.forEach(addedNode => {
-      if (addedNode && addedNode.classList && addedNode.classList.contains('js-inline-comments-container') && addedNode.querySelector('markdown-toolbar')) {
-        const suggestionDiv = addedNode.querySelector('markdown-toolbar');
-        const commentTextarea = addedNode.querySelector('textarea');
-        createButton(suggestionDiv, commentTextarea);
+      if (!addedNode || !addedNode.querySelector) {
+        return;
+      }
+
+      const commentTextarea = addedNode.querySelector('textarea');
+      if (!commentTextarea) {
+        return;
+      }
+
+      if (commentTextarea.getAttribute('name') === 'comment[body]') {
+        console.log('hoho', addedNode)
+        const parentDiv = commentTextarea.closest('div');
+  
+        if (!divsWithButton.includes(parentDiv)) {
+          parentDiv.style.position = 'relative';
+          createButton(parentDiv, commentTextarea);
+          addedNodes.push(parentDiv);
+        }
       }
     })
   })
@@ -109,4 +123,4 @@ const addEmojiButtonsToInlineForms = () => {
   }
 }
 
-addEmojiButtonsToInlineForms();
+// addEmojiButtonsToInlineForms();
