@@ -61,7 +61,8 @@ function createButton(container, commentTextarea) {
   button.setAttribute(
     'style',
     'background: var(--color-canvas-subtle); border: 1px solid var(--color-border-default); border-radius: 8px; position: absolute; left: -34px; top: 6px; padding: 4px;',
-  );  
+  );
+  // TODO: this should only fire once
   button.onclick = (e) => { showEmojis(container, commentTextarea) };
   container.appendChild(button);
 }
@@ -96,6 +97,7 @@ const observer = new MutationObserver(mutations => {
 
 observer.observe(document.querySelector('body'), { subtree: true, childList: true });
 
+// TODO: Update this method to sync with the above
 const applyButtonToForm = (context, floating = false) => {
   if (!context) {
     return;
