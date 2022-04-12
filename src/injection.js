@@ -13,6 +13,7 @@ const emojis = [
 ];
 const emojiLines = emojis.map(emojiLine => emojiLine.join(' '));
 
+// TODO: Find new position for the icon, the review changes textarea is in a block with overflow hidden 🤦
 function closeButton(node) {
   var button = document.createElement("input");
   button.type = "button";
