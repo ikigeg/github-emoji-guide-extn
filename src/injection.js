@@ -13,11 +13,30 @@ const emojis = [
 ];
 const emojiLines = emojis.map(emojiLine => emojiLine.join(' '));
 
+function closeButton(node) {
+  var button = document.createElement("input");
+  button.type = "button";
+  button.value = "❌"; 
+  button.classList.add('toolbar-item');
+  button.classList.add('btn-octicon');
+  button.setAttribute(
+    'style',
+    'border: 1px solid var(--color-border-default); position: absolute; right: 0; top: 0; padding: 4px;',
+  );
+
+  button.onclick = () => {
+    node.parentNode.removeChild(node);
+  };
+
+  node.appendChild(button);
+}
+
 function showEmojis(context, commentTextarea) {
   const node = document.createElement("div");
+  node.classList.add('emoji-guide-list-container');
   node.setAttribute(
     'style',
-    'position:absolute; z-index: 100; top: 0; left: 0; background: var(--color-canvas-subtle); border: 1px solid var(--color-border-default); color: white;',
+    'position:absolute; z-index: 100; top: -68px; left: -6px; background: var(--color-canvas-subtle); border: 1px solid var(--color-border-default); color: white;',
   );
   const list = document.createElement("ul");
   list.setAttribute(
@@ -31,7 +50,7 @@ function showEmojis(context, commentTextarea) {
     li.setAttribute('data-description', description);
     li.setAttribute(
       'style',
-      'padding: 2px 4px; cursor: pointer; color: var(--color-fg-muted);',
+      'padding: 2px 4px; cursor: pointer; color: var(--color-btn-text);',
     );
     li.appendChild(text);
 
@@ -46,8 +65,10 @@ function showEmojis(context, commentTextarea) {
 
     list.appendChild(li);
   });
-
+  
+  closeButton(node);
   node.appendChild(list);
+
 
   context.appendChild(node);
 }
@@ -60,14 +81,38 @@ function createButton(container, commentTextarea) {
   button.classList.add('btn-octicon');
   button.setAttribute(
     'style',
-    'background: var(--color-canvas-subtle); border: 1px solid var(--color-border-default); border-radius: 8px; position: absolute; left: -34px; top: 6px; padding: 4px;',
+    'background: var(--color-canvas-subtle); border: 1px solid var(--color-border-default); border-radius: 4px; position: absolute; left: -34px; top: 6px; padding: 4px;',
   );
-  // TODO: this should only fire once
-  button.onclick = (e) => { showEmojis(container, commentTextarea) };
+
+  button.onclick = (e) => {
+    if (!container.querySelector('.emoji-guide-list-container')) {
+      showEmojis(container, commentTextarea);
+    }
+  };
+
   container.appendChild(button);
 }
 
 let divsWithButton = [];
+
+const validCommentBoxNames = [
+  'comment[body]',
+  'pull_request_review[body]',
+];
+
+const applyButtonToCommentBody = (commentTextarea) => {
+  console.log('applyButtonToCommentBody', commentTextarea, commentTextarea.getAttribute('name'), validCommentBoxNames.includes(commentTextarea.getAttribute('name')))
+  if (validCommentBoxNames.includes(commentTextarea.getAttribute('name'))) {
+    const parentDiv = commentTextarea.closest('div');
+
+    if (!divsWithButton.includes(parentDiv)) {
+      console.log('yoyo', parentDiv)
+      parentDiv.style.position = 'relative';
+      createButton(parentDiv, commentTextarea);
+      divsWithButton.push(parentDiv);
+    }
+  }
+}
 
 const observer = new MutationObserver(mutations => {
   mutations.forEach(mutation => {
@@ -81,48 +126,19 @@ const observer = new MutationObserver(mutations => {
         return;
       }
 
-      if (commentTextarea.getAttribute('name') === 'comment[body]') {
-        console.log('hoho', addedNode)
-        const parentDiv = commentTextarea.closest('div');
-  
-        if (!divsWithButton.includes(parentDiv)) {
-          parentDiv.style.position = 'relative';
-          createButton(parentDiv, commentTextarea);
-          addedNodes.push(parentDiv);
-        }
-      }
+      applyButtonToCommentBody(commentTextarea);
     })
   })
 });
-
 observer.observe(document.querySelector('body'), { subtree: true, childList: true });
 
-// TODO: Update this method to sync with the above
-const applyButtonToForm = (context, floating = false) => {
-  if (!context) {
-    return;
-  }
-
-  const suggestionDiv = context.querySelector('markdown-toolbar');
-  if (!suggestionDiv) {
-    return;
-  }
-
-  const commentTextarea = context.querySelector('textarea');
-  createButton(suggestionDiv, commentTextarea, floating);
-}
-
 const addEmojiButtonsToInlineForms = () => {
-  const reviewChangesButtonForm = document.querySelector('.js-previewable-comment-form');
-  if (reviewChangesButtonForm) {
-    applyButtonToForm(reviewChangesButtonForm)
-  }
+  const commentTextareas = Array.from(document.querySelectorAll('textarea'));
 
-  const reviewInlineCommentForms = Array.from(document.querySelectorAll('.js-inline-comment-form'));
-  if (reviewInlineCommentForms) {
-    'div.flex-nowrap.d-inline-block.mr-3'
-    reviewInlineCommentForms.forEach((element) => applyButtonToForm(element, true));
+  if (commentTextareas) {
+    commentTextareas.forEach((commentTextarea) => applyButtonToCommentBody(commentTextarea));
   }
 }
+addEmojiButtonsToInlineForms();
 
-// addEmojiButtonsToInlineForms();
+console.log('🌱 Emoji guide online!')
