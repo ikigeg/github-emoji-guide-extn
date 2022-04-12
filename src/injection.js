@@ -82,7 +82,7 @@ function createButton(container, commentTextarea) {
   button.classList.add('btn-octicon');
   button.setAttribute(
     'style',
-    'background: var(--color-canvas-subtle); border: 1px solid var(--color-border-default); border-radius: 4px; position: absolute; left: -34px; top: 6px; padding: 4px;',
+    'background: var(--color-canvas-subtle); border: 1px solid var(--color-border-default); border-radius: 4px; position: absolute; left: -28px; top: 6px; padding: 4px;',
   );
 
   button.onclick = (e) => {
