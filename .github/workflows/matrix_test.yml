@@ -40,6 +40,7 @@ jobs:
 
   output_status:
     runs-on: ubuntu-latest
+    if: ${{ always() }}
     needs: [matrix_versions]
     
     steps:
