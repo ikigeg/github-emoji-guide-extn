@@ -4,7 +4,7 @@ This is an attempt at capturing the wisdom of https://github.com/erikthedevelope
 
 ## Usage
 
-The easiest way to install this will be by the chrome store (link coming soon), otherwise:
+The easiest way to install this will be by the [chrome store](https://chrome.google.com/webstore/detail/github-code-review-emoji/clfgafbjfjekemkaheemigmjhoobonee?hl=en-GB), otherwise:
 
 1. Download [github-emoji-guide.zip](./github-emoji-guide.zip) to your machine
 2. Unzip the file
