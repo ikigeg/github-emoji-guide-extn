@@ -12,6 +12,13 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+  skipped_job:
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'turkey' }}
+    steps:
+      - name: This step will not run
+        run: echo "hello"
+        
   # This workflow contains a single job called "build"
   matrix_versions:
     # The type of runner that the job will run on
@@ -41,7 +48,7 @@ jobs:
   output_status:
     runs-on: ubuntu-latest
     if: ${{ always() }}
-    needs: [matrix_versions]
+    needs: [skipped_job, matrix_versions]
     
     steps:
       - name: Dump GitHub context
@@ -58,5 +65,8 @@ jobs:
       - name: Dump matrix context
         run: echo '${{ toJSON(matrix) }}'
       - name: Dump Other job
-        id: github_job_context_step
+        id: matrix_versions_toJson
         run: echo '${{ toJSON(needs.matrix_versions) }}'
+      - name: Dump Skipped job
+        id: skipped_job_toJson
+        run: echo '${{ toJSON(needs.skipped_job) }}'
